@@ -1,0 +1,10 @@
+[0m[[0minfo[0m] [0m[32mSessionRepoImplTest:[0m[0m
+[0m[[0minfo[0m] [0m[32m- Create Of Session[0m[0m
+[0m[[0minfo[0m] [0m[32m- Exception in Create Of Session[0m[0m
+[0m[[0minfo[0m] [0m[32m- Update Of Session[0m[0m
+[0m[[0minfo[0m] [0m[32m- Exception in Update Of Session[0m[0m
+[0m[[0minfo[0m] [0m[32m- getById() Of Session[0m[0m
+[0m[[0minfo[0m] [0m[32m- Exception in getById Of Session[0m[0m
+[0m[[0minfo[0m] [0m[32m- getList Of Session[0m[0m
+[0m[[0minfo[0m] [0m[32m- delete Of Session[0m[0m
+[0m[[0minfo[0m] [0m[32m- Negative delete Of Session[0m[0m

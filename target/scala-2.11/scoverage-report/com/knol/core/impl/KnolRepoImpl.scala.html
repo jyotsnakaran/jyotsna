@@ -1,0 +1,2478 @@
+<html>
+      <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <title id="title">
+          com/knol/core/impl/KnolRepoImpl.scala.html
+        </title>
+        <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css"/>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+        <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+        <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.18.3/addons/pager/jquery.tablesorter.pager.min.js"></script>
+        <style>
+          table.codegrid { font-family: monospace; font-size: 12px; width: auto!important; }table.statementlist { width: auto!important; font-size: 13px; } table.codegrid td { padding: 0!important; border: 0!important } table td.linenumber { width: 40px!important; } 
+        </style>
+      </head>
+      <body style="font-family: monospace;">
+        <ul class="nav nav-tabs">
+          <li>
+            <a href="#codegrid" data-toggle="tab">Codegrid</a>
+          </li>
+          <li>
+            <a href="#statementlist" data-toggle="tab">Statement List</a>
+          </li>
+        </ul>
+        <div class="tab-content">
+          <div class="tab-pane active" id="codegrid">
+            <pre style='font-size: 12pt; font-family: courier;'>1 <span style=''>package com.knol.core.impl
+</span>2 <span style=''>
+</span>3 <span style=''>import org.slf4j.LoggerFactory
+</span>4 <span style=''>import com.knol.core.Knol
+</span>5 <span style=''>import com.knol.core.KnolRepo
+</span>6 <span style=''>import com.knol.db.connection.DBConnection
+</span>7 <span style=''>
+</span>8 <span style=''>class KnolRepoImpl extends KnolRepo with DBConnection {
+</span>9 <span style=''>
+</span>10 <span style=''>  val DB_NAME = </span><span style='background: #AEF1AE'>1</span><span style=''>
+</span>11 <span style=''>  val DB_EMAIL = </span><span style='background: #AEF1AE'>2</span><span style=''>
+</span>12 <span style=''>  val DB_MOBILE = </span><span style='background: #AEF1AE'>3</span><span style=''>
+</span>13 <span style=''>  val DB_ID = </span><span style='background: #AEF1AE'>4</span><span style=''>
+</span>14 <span style=''>  /**
+</span>15 <span style=''>   * create method inserts the new rows in table 'knol'
+</span>16 <span style=''>   * id is the primary key for knol
+</span>17 <span style=''>   */
+</span>18 <span style=''>  def create(knol: Knol): Option[Int] =
+</span>19 <span style=''>    {
+</span>20 <span style=''>      val conn = </span><span style='background: #AEF1AE'>getConnect()</span><span style=''>
+</span>21 <span style=''>
+</span>22 <span style=''>      conn match {
+</span>23 <span style=''>        case Some(conn) =>
+</span>24 <span style=''>          try {
+</span>25 <span style=''>            </span><span style='background: #AEF1AE'>val prep = conn.prepareStatement("INSERT INTO KNOL (name,email,mobile) VALUES (?,?,?) ")
+</span>26 <span style=''></span><span style='background: #AEF1AE'>            //  prep.setInt(1, knol.id)
+</span>27 <span style=''></span><span style='background: #AEF1AE'>            prep.setString(DB_NAME, knol.name)
+</span>28 <span style=''></span><span style='background: #AEF1AE'>            prep.setString(DB_EMAIL, knol.email)
+</span>29 <span style=''></span><span style='background: #AEF1AE'>            prep.setString(3, knol.mobile)
+</span>30 <span style=''></span><span style='background: #AEF1AE'>            val rows = prep.executeUpdate
+</span>31 <span style=''></span><span style='background: #AEF1AE'>            logger.debug("Rows affected " + rows)
+</span>32 <span style=''></span><span style='background: #AEF1AE'>            logger.debug("inserted successfully")
+</span>33 <span style=''></span><span style='background: #AEF1AE'>            Some(rows)</span><span style=''>
+</span>34 <span style=''>          } catch {
+</span>35 <span style=''>            case ex: Exception => </span><span style='background: #AEF1AE'>None</span><span style=''>
+</span>36 <span style=''>          } finally {
+</span>37 <span style=''>            </span><span style='background: #AEF1AE'>conn.close()</span><span style=''>
+</span>38 <span style=''>          }
+</span>39 <span style=''>        case None =>
+</span>40 <span style=''>          </span><span style='background: #F0ADAD'>None</span><span style=''>
+</span>41 <span style=''>      }
+</span>42 <span style=''>    }
+</span>43 <span style=''>  /**
+</span>44 <span style=''>   * updating the rows of table KNOL based on the id passed
+</span>45 <span style=''>   */
+</span>46 <span style=''>  def update(knol: Knol): Option[Int] =
+</span>47 <span style=''>    {
+</span>48 <span style=''>      val conn = </span><span style='background: #AEF1AE'>getConnect()</span><span style=''>
+</span>49 <span style=''>
+</span>50 <span style=''>      conn match {
+</span>51 <span style=''>
+</span>52 <span style=''>        case Some(conn) =>
+</span>53 <span style=''>          try{
+</span>54 <span style=''>          </span><span style='background: #AEF1AE'>val prep = conn.prepareStatement("update KNOL set name=?,email=?,mobile=? where id=?")
+</span>55 <span style=''></span><span style='background: #AEF1AE'>          prep.setString(DB_NAME, knol.name)
+</span>56 <span style=''></span><span style='background: #AEF1AE'>          prep.setString(DB_EMAIL, knol.email)
+</span>57 <span style=''></span><span style='background: #AEF1AE'>          prep.setString(DB_MOBILE, knol.mobile)
+</span>58 <span style=''></span><span style='background: #AEF1AE'>          prep.setInt(DB_ID, knol.id)
+</span>59 <span style=''></span><span style='background: #AEF1AE'>          val rows = prep.executeUpdate
+</span>60 <span style=''></span><span style='background: #AEF1AE'>          logger.debug("Rows affected " + rows)
+</span>61 <span style=''></span><span style='background: #AEF1AE'>          logger.debug("updated successfully")
+</span>62 <span style=''></span><span style='background: #AEF1AE'>             require(rows >= 1)
+</span>63 <span style=''></span><span style='background: #AEF1AE'>          Some(rows)</span><span style=''>
+</span>64 <span style=''>        } catch {
+</span>65 <span style=''>          case ex: Exception => </span><span style='background: #AEF1AE'>None</span><span style=''>
+</span>66 <span style=''>        } finally {
+</span>67 <span style=''>          </span><span style='background: #AEF1AE'>conn.close()</span><span style=''>
+</span>68 <span style=''>        }
+</span>69 <span style=''>
+</span>70 <span style=''>        case None =>
+</span>71 <span style=''>          </span><span style='background: #F0ADAD'>None</span><span style=''>
+</span>72 <span style=''>      }
+</span>73 <span style=''>    }
+</span>74 <span style=''>  /**
+</span>75 <span style=''>   * deleting the rows of table KNOL based on the id passed
+</span>76 <span style=''>   */
+</span>77 <span style=''>  def delete(id: Int): Option[Int] = {
+</span>78 <span style=''>    val conn = </span><span style='background: #AEF1AE'>getConnect()</span><span style=''>
+</span>79 <span style=''>
+</span>80 <span style=''>    conn match {
+</span>81 <span style=''>      case Some(conn) =>
+</span>82 <span style=''>        try{
+</span>83 <span style=''>        </span><span style='background: #AEF1AE'>val prep = conn.prepareStatement("delete from KNOL where id=?")
+</span>84 <span style=''></span><span style='background: #AEF1AE'>        prep.setInt(1, id)
+</span>85 <span style=''></span><span style='background: #AEF1AE'>        val rows = prep.executeUpdate
+</span>86 <span style=''></span><span style='background: #AEF1AE'>        logger.debug("Rows affected " + rows)
+</span>87 <span style=''></span><span style='background: #AEF1AE'>        logger.debug("deleted successfully")
+</span>88 <span style=''></span><span style='background: #AEF1AE'>           require(rows >= 1)
+</span>89 <span style=''></span><span style='background: #AEF1AE'>          Some(rows)</span><span style=''>
+</span>90 <span style=''>        } catch {
+</span>91 <span style=''>          case ex: Exception => </span><span style='background: #AEF1AE'>None</span><span style=''>
+</span>92 <span style=''>        } finally {
+</span>93 <span style=''>          </span><span style='background: #AEF1AE'>conn.close()</span><span style=''>
+</span>94 <span style=''>        }
+</span>95 <span style=''>
+</span>96 <span style=''>      case None =>
+</span>97 <span style=''>        </span><span style='background: #F0ADAD'>logger.debug("Error")</span><span style=''>
+</span>98 <span style=''>        </span><span style='background: #F0ADAD'>None</span><span style=''>
+</span>99 <span style=''>
+</span>100 <span style=''>    }
+</span>101 <span style=''>  }
+</span>102 <span style=''>  /**
+</span>103 <span style=''>   * getIntern method retrieves the rows of table KNOL based on the id passed to it.
+</span>104 <span style=''>   */
+</span>105 <span style=''>  def getIntern(id: Int): Option[Knol] = {
+</span>106 <span style=''>    val conn = </span><span style='background: #AEF1AE'>getConnect()</span><span style=''>
+</span>107 <span style=''>
+</span>108 <span style=''>    conn match {
+</span>109 <span style=''>      case Some(conn) =>
+</span>110 <span style=''>        try {
+</span>111 <span style=''>          </span><span style='background: #AEF1AE'>val query = "select * from KNOL where id=" + id + ";"
+</span>112 <span style=''></span><span style='background: #AEF1AE'>          val ps = conn.createStatement();
+</span>113 <span style=''></span><span style='background: #AEF1AE'>          val set = ps.executeQuery(query);
+</span>114 <span style=''></span><span style='background: #AEF1AE'>
+</span>115 <span style=''></span><span style='background: #AEF1AE'>          set.next()
+</span>116 <span style=''></span><span style='background: #AEF1AE'>          val kid = set.getInt("id")
+</span>117 <span style=''></span><span style='background: #AEF1AE'>          val kname = set.getString("name")
+</span>118 <span style=''></span><span style='background: #AEF1AE'>          val kemail = set.getString("email")
+</span>119 <span style=''></span><span style='background: #AEF1AE'>          val kmobile = set.getString("mobile")
+</span>120 <span style=''></span><span style='background: #AEF1AE'>
+</span>121 <span style=''></span><span style='background: #AEF1AE'>          //   logger.debug(Knol(kmobile, kname, kemail, kid))
+</span>122 <span style=''></span><span style='background: #AEF1AE'>          Some(Knol(kname, kemail, kmobile, kid))</span><span style=''>
+</span>123 <span style=''>        } catch {
+</span>124 <span style=''>          case ex: Exception => </span><span style='background: #AEF1AE'>None</span><span style=''>
+</span>125 <span style=''>        } finally {
+</span>126 <span style=''>          </span><span style='background: #AEF1AE'>conn.close()</span><span style=''>
+</span>127 <span style=''>        }
+</span>128 <span style=''>      case None =>
+</span>129 <span style=''>        </span><span style='background: #F0ADAD'>None</span><span style=''>
+</span>130 <span style=''>    }
+</span>131 <span style=''>  }
+</span>132 <span style=''>   /**
+</span>133 <span style=''>   * getIntern method retrieves all the rows of table KNOL.
+</span>134 <span style=''>   */
+</span>135 <span style=''>  import scala.collection.mutable.MutableList
+</span>136 <span style=''>  def getInternList(): Option[MutableList[Knol]] = {
+</span>137 <span style=''>    val conn = </span><span style='background: #AEF1AE'>getConnect()</span><span style=''>
+</span>138 <span style=''>    val knol_list = </span><span style='background: #AEF1AE'>MutableList[Knol]()</span><span style=''>
+</span>139 <span style=''>    conn match {
+</span>140 <span style=''>      case Some(conn) =>
+</span>141 <span style=''>        try{
+</span>142 <span style=''>        </span><span style='background: #AEF1AE'>val query = "select * from KNOL;"
+</span>143 <span style=''></span><span style='background: #AEF1AE'>        val ps = conn.createStatement();
+</span>144 <span style=''></span><span style='background: #AEF1AE'>        val set = ps.executeQuery(query);
+</span>145 <span style=''></span><span style='background: #AEF1AE'>
+</span>146 <span style=''></span><span style='background: #AEF1AE'>        while (set.next()) {
+</span>147 <span style=''></span><span style='background: #AEF1AE'>          val kid = set.getInt("id")
+</span>148 <span style=''></span><span style='background: #AEF1AE'>          val kname = set.getString("name")
+</span>149 <span style=''></span><span style='background: #AEF1AE'>          val kemail = set.getString("email")
+</span>150 <span style=''></span><span style='background: #AEF1AE'>          val kmobile = set.getString("mobile")
+</span>151 <span style=''></span><span style='background: #AEF1AE'>          knol_list += (Knol(kmobile, kname, kemail, kid))
+</span>152 <span style=''></span><span style='background: #AEF1AE'>        }
+</span>153 <span style=''></span><span style='background: #AEF1AE'>        Some(knol_list)</span><span style=''>
+</span>154 <span style=''>        } catch {
+</span>155 <span style=''>          case ex: Exception => </span><span style='background: #F0ADAD'>None</span><span style=''>
+</span>156 <span style=''>        } finally {
+</span>157 <span style=''>          </span><span style='background: #AEF1AE'>conn.close()</span><span style=''>
+</span>158 <span style=''>        }
+</span>159 <span style=''>      case None =>
+</span>160 <span style=''>        </span><span style='background: #F0ADAD'>None</span><span style=''>
+</span>161 <span style=''>    }
+</span>162 <span style=''>  }
+</span>163 <span style=''>
+</span>164 <span style=''>}
+</span></pre>
+          </div>
+          <div class="tab-pane" id="statementlist">
+            <table cellspacing="0" cellpadding="0" class="table statementlist">
+      <tr>
+        <th>Line</th>
+        <th>Stmt Id</th>
+        <th>Pos</th>
+        <th>Tree</th>
+        <th>Symbol</th>
+        <th>Code</th>
+      </tr><tr>
+        <td>
+          10
+        </td>
+        <td>
+          1
+        </td>
+        <td>
+          232
+          -
+          233
+        </td>
+        <td>
+          Literal
+        </td>
+        <td>
+          &lt;nosymbol&gt;
+        </td>
+        <td style="background: #AEF1AE">
+          1
+        </td>
+      </tr><tr>
+        <td>
+          11
+        </td>
+        <td>
+          2
+        </td>
+        <td>
+          251
+          -
+          252
+        </td>
+        <td>
+          Literal
+        </td>
+        <td>
+          &lt;nosymbol&gt;
+        </td>
+        <td style="background: #AEF1AE">
+          2
+        </td>
+      </tr><tr>
+        <td>
+          12
+        </td>
+        <td>
+          3
+        </td>
+        <td>
+          271
+          -
+          272
+        </td>
+        <td>
+          Literal
+        </td>
+        <td>
+          &lt;nosymbol&gt;
+        </td>
+        <td style="background: #AEF1AE">
+          3
+        </td>
+      </tr><tr>
+        <td>
+          13
+        </td>
+        <td>
+          4
+        </td>
+        <td>
+          287
+          -
+          288
+        </td>
+        <td>
+          Literal
+        </td>
+        <td>
+          &lt;nosymbol&gt;
+        </td>
+        <td style="background: #AEF1AE">
+          4
+        </td>
+      </tr><tr>
+        <td>
+          20
+        </td>
+        <td>
+          5
+        </td>
+        <td>
+          456
+          -
+          468
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          com.knol.db.connection.DBConnection.getConnect
+        </td>
+        <td style="background: #AEF1AE">
+          KnolRepoImpl.this.getConnect()
+        </td>
+      </tr><tr>
+        <td>
+          24
+        </td>
+        <td>
+          21
+        </td>
+        <td>
+          544
+          -
+          976
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;nosymbol&gt;
+        </td>
+        <td style="background: #AEF1AE">
+          {
+  val prep: java.sql.PreparedStatement = conn.prepareStatement(&quot;INSERT INTO KNOL (name,email,mobile) VALUES (?,?,?) &quot;);
+  prep.setString(KnolRepoImpl.this.DB_NAME, knol.name);
+  prep.setString(KnolRepoImpl.this.DB_EMAIL, knol.email);
+  prep.setString(3, knol.mobile);
+  val rows: Int = prep.executeUpdate();
+  KnolRepoImpl.this.logger.debug(&quot;Rows affected &quot;.+(rows));
+  KnolRepoImpl.this.logger.debug(&quot;inserted successfully&quot;);
+  scala.Some.apply[Int](rows)
+}
+        </td>
+      </tr><tr>
+        <td>
+          25
+        </td>
+        <td>
+          6
+        </td>
+        <td>
+          555
+          -
+          632
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.Connection.prepareStatement
+        </td>
+        <td style="background: #AEF1AE">
+          conn.prepareStatement(&quot;INSERT INTO KNOL (name,email,mobile) VALUES (?,?,?) &quot;)
+        </td>
+      </tr><tr>
+        <td>
+          27
+        </td>
+        <td>
+          8
+        </td>
+        <td>
+          709
+          -
+          718
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          com.knol.core.Knol.name
+        </td>
+        <td style="background: #AEF1AE">
+          knol.name
+        </td>
+      </tr><tr>
+        <td>
+          27
+        </td>
+        <td>
+          7
+        </td>
+        <td>
+          700
+          -
+          707
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          com.knol.core.impl.KnolRepoImpl.DB_NAME
+        </td>
+        <td style="background: #AEF1AE">
+          KnolRepoImpl.this.DB_NAME
+        </td>
+      </tr><tr>
+        <td>
+          27
+        </td>
+        <td>
+          9
+        </td>
+        <td>
+          685
+          -
+          719
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.PreparedStatement.setString
+        </td>
+        <td style="background: #AEF1AE">
+          prep.setString(KnolRepoImpl.this.DB_NAME, knol.name)
+        </td>
+      </tr><tr>
+        <td>
+          28
+        </td>
+        <td>
+          11
+        </td>
+        <td>
+          757
+          -
+          767
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          com.knol.core.Knol.email
+        </td>
+        <td style="background: #AEF1AE">
+          knol.email
+        </td>
+      </tr><tr>
+        <td>
+          28
+        </td>
+        <td>
+          10
+        </td>
+        <td>
+          747
+          -
+          755
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          com.knol.core.impl.KnolRepoImpl.DB_EMAIL
+        </td>
+        <td style="background: #AEF1AE">
+          KnolRepoImpl.this.DB_EMAIL
+        </td>
+      </tr><tr>
+        <td>
+          28
+        </td>
+        <td>
+          12
+        </td>
+        <td>
+          732
+          -
+          768
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.PreparedStatement.setString
+        </td>
+        <td style="background: #AEF1AE">
+          prep.setString(KnolRepoImpl.this.DB_EMAIL, knol.email)
+        </td>
+      </tr><tr>
+        <td>
+          29
+        </td>
+        <td>
+          14
+        </td>
+        <td>
+          799
+          -
+          810
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          com.knol.core.Knol.mobile
+        </td>
+        <td style="background: #AEF1AE">
+          knol.mobile
+        </td>
+      </tr><tr>
+        <td>
+          29
+        </td>
+        <td>
+          13
+        </td>
+        <td>
+          796
+          -
+          797
+        </td>
+        <td>
+          Literal
+        </td>
+        <td>
+          &lt;nosymbol&gt;
+        </td>
+        <td style="background: #AEF1AE">
+          3
+        </td>
+      </tr><tr>
+        <td>
+          29
+        </td>
+        <td>
+          15
+        </td>
+        <td>
+          781
+          -
+          811
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.PreparedStatement.setString
+        </td>
+        <td style="background: #AEF1AE">
+          prep.setString(3, knol.mobile)
+        </td>
+      </tr><tr>
+        <td>
+          30
+        </td>
+        <td>
+          16
+        </td>
+        <td>
+          835
+          -
+          853
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.PreparedStatement.executeUpdate
+        </td>
+        <td style="background: #AEF1AE">
+          prep.executeUpdate()
+        </td>
+      </tr><tr>
+        <td>
+          31
+        </td>
+        <td>
+          17
+        </td>
+        <td>
+          879
+          -
+          902
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.lang.String.+
+        </td>
+        <td style="background: #AEF1AE">
+          &quot;Rows affected &quot;.+(rows)
+        </td>
+      </tr><tr>
+        <td>
+          31
+        </td>
+        <td>
+          18
+        </td>
+        <td>
+          866
+          -
+          903
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          org.slf4j.Logger.debug
+        </td>
+        <td style="background: #AEF1AE">
+          KnolRepoImpl.this.logger.debug(&quot;Rows affected &quot;.+(rows))
+        </td>
+      </tr><tr>
+        <td>
+          32
+        </td>
+        <td>
+          19
+        </td>
+        <td>
+          916
+          -
+          953
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          org.slf4j.Logger.debug
+        </td>
+        <td style="background: #AEF1AE">
+          KnolRepoImpl.this.logger.debug(&quot;inserted successfully&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          33
+        </td>
+        <td>
+          20
+        </td>
+        <td>
+          966
+          -
+          976
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          scala.Some.apply
+        </td>
+        <td style="background: #AEF1AE">
+          scala.Some.apply[Int](rows)
+        </td>
+      </tr><tr>
+        <td>
+          35
+        </td>
+        <td>
+          22
+        </td>
+        <td>
+          1031
+          -
+          1035
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          scala.None
+        </td>
+        <td style="background: #AEF1AE">
+          scala.None
+        </td>
+      </tr><tr>
+        <td>
+          37
+        </td>
+        <td>
+          23
+        </td>
+        <td>
+          1070
+          -
+          1082
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.Connection.close
+        </td>
+        <td style="background: #AEF1AE">
+          conn.close()
+        </td>
+      </tr><tr>
+        <td>
+          37
+        </td>
+        <td>
+          24
+        </td>
+        <td>
+          1070
+          -
+          1082
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          java.sql.Connection.close
+        </td>
+        <td style="background: #AEF1AE">
+          conn.close()
+        </td>
+      </tr><tr>
+        <td>
+          40
+        </td>
+        <td>
+          25
+        </td>
+        <td>
+          1126
+          -
+          1130
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          scala.None
+        </td>
+        <td style="background: #F0ADAD">
+          scala.None
+        </td>
+      </tr><tr>
+        <td>
+          48
+        </td>
+        <td>
+          26
+        </td>
+        <td>
+          1280
+          -
+          1292
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          com.knol.db.connection.DBConnection.getConnect
+        </td>
+        <td style="background: #AEF1AE">
+          KnolRepoImpl.this.getConnect()
+        </td>
+      </tr><tr>
+        <td>
+          53
+        </td>
+        <td>
+          47
+        </td>
+        <td>
+          1366
+          -
+          1819
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;nosymbol&gt;
+        </td>
+        <td style="background: #AEF1AE">
+          {
+  val prep: java.sql.PreparedStatement = conn.prepareStatement(&quot;update KNOL set name=?,email=?,mobile=? where id=?&quot;);
+  prep.setString(KnolRepoImpl.this.DB_NAME, knol.name);
+  prep.setString(KnolRepoImpl.this.DB_EMAIL, knol.email);
+  prep.setString(KnolRepoImpl.this.DB_MOBILE, knol.mobile);
+  prep.setInt(KnolRepoImpl.this.DB_ID, knol.id);
+  val rows: Int = prep.executeUpdate();
+  KnolRepoImpl.this.logger.debug(&quot;Rows affected &quot;.+(rows));
+  KnolRepoImpl.this.logger.debug(&quot;updated successfully&quot;);
+  scala.this.Predef.require(rows.&gt;=(1));
+  scala.Some.apply[Int](rows)
+}
+        </td>
+      </tr><tr>
+        <td>
+          54
+        </td>
+        <td>
+          27
+        </td>
+        <td>
+          1377
+          -
+          1452
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.Connection.prepareStatement
+        </td>
+        <td style="background: #AEF1AE">
+          conn.prepareStatement(&quot;update KNOL set name=?,email=?,mobile=? where id=?&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          55
+        </td>
+        <td>
+          29
+        </td>
+        <td>
+          1487
+          -
+          1496
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          com.knol.core.Knol.name
+        </td>
+        <td style="background: #AEF1AE">
+          knol.name
+        </td>
+      </tr><tr>
+        <td>
+          55
+        </td>
+        <td>
+          28
+        </td>
+        <td>
+          1478
+          -
+          1485
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          com.knol.core.impl.KnolRepoImpl.DB_NAME
+        </td>
+        <td style="background: #AEF1AE">
+          KnolRepoImpl.this.DB_NAME
+        </td>
+      </tr><tr>
+        <td>
+          55
+        </td>
+        <td>
+          30
+        </td>
+        <td>
+          1463
+          -
+          1497
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.PreparedStatement.setString
+        </td>
+        <td style="background: #AEF1AE">
+          prep.setString(KnolRepoImpl.this.DB_NAME, knol.name)
+        </td>
+      </tr><tr>
+        <td>
+          56
+        </td>
+        <td>
+          32
+        </td>
+        <td>
+          1533
+          -
+          1543
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          com.knol.core.Knol.email
+        </td>
+        <td style="background: #AEF1AE">
+          knol.email
+        </td>
+      </tr><tr>
+        <td>
+          56
+        </td>
+        <td>
+          31
+        </td>
+        <td>
+          1523
+          -
+          1531
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          com.knol.core.impl.KnolRepoImpl.DB_EMAIL
+        </td>
+        <td style="background: #AEF1AE">
+          KnolRepoImpl.this.DB_EMAIL
+        </td>
+      </tr><tr>
+        <td>
+          56
+        </td>
+        <td>
+          33
+        </td>
+        <td>
+          1508
+          -
+          1544
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.PreparedStatement.setString
+        </td>
+        <td style="background: #AEF1AE">
+          prep.setString(KnolRepoImpl.this.DB_EMAIL, knol.email)
+        </td>
+      </tr><tr>
+        <td>
+          57
+        </td>
+        <td>
+          35
+        </td>
+        <td>
+          1581
+          -
+          1592
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          com.knol.core.Knol.mobile
+        </td>
+        <td style="background: #AEF1AE">
+          knol.mobile
+        </td>
+      </tr><tr>
+        <td>
+          57
+        </td>
+        <td>
+          34
+        </td>
+        <td>
+          1570
+          -
+          1579
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          com.knol.core.impl.KnolRepoImpl.DB_MOBILE
+        </td>
+        <td style="background: #AEF1AE">
+          KnolRepoImpl.this.DB_MOBILE
+        </td>
+      </tr><tr>
+        <td>
+          57
+        </td>
+        <td>
+          36
+        </td>
+        <td>
+          1555
+          -
+          1593
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.PreparedStatement.setString
+        </td>
+        <td style="background: #AEF1AE">
+          prep.setString(KnolRepoImpl.this.DB_MOBILE, knol.mobile)
+        </td>
+      </tr><tr>
+        <td>
+          58
+        </td>
+        <td>
+          38
+        </td>
+        <td>
+          1623
+          -
+          1630
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          com.knol.core.Knol.id
+        </td>
+        <td style="background: #AEF1AE">
+          knol.id
+        </td>
+      </tr><tr>
+        <td>
+          58
+        </td>
+        <td>
+          37
+        </td>
+        <td>
+          1616
+          -
+          1621
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          com.knol.core.impl.KnolRepoImpl.DB_ID
+        </td>
+        <td style="background: #AEF1AE">
+          KnolRepoImpl.this.DB_ID
+        </td>
+      </tr><tr>
+        <td>
+          58
+        </td>
+        <td>
+          39
+        </td>
+        <td>
+          1604
+          -
+          1631
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.PreparedStatement.setInt
+        </td>
+        <td style="background: #AEF1AE">
+          prep.setInt(KnolRepoImpl.this.DB_ID, knol.id)
+        </td>
+      </tr><tr>
+        <td>
+          59
+        </td>
+        <td>
+          40
+        </td>
+        <td>
+          1653
+          -
+          1671
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.PreparedStatement.executeUpdate
+        </td>
+        <td style="background: #AEF1AE">
+          prep.executeUpdate()
+        </td>
+      </tr><tr>
+        <td>
+          60
+        </td>
+        <td>
+          41
+        </td>
+        <td>
+          1695
+          -
+          1718
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.lang.String.+
+        </td>
+        <td style="background: #AEF1AE">
+          &quot;Rows affected &quot;.+(rows)
+        </td>
+      </tr><tr>
+        <td>
+          60
+        </td>
+        <td>
+          42
+        </td>
+        <td>
+          1682
+          -
+          1719
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          org.slf4j.Logger.debug
+        </td>
+        <td style="background: #AEF1AE">
+          KnolRepoImpl.this.logger.debug(&quot;Rows affected &quot;.+(rows))
+        </td>
+      </tr><tr>
+        <td>
+          61
+        </td>
+        <td>
+          43
+        </td>
+        <td>
+          1730
+          -
+          1766
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          org.slf4j.Logger.debug
+        </td>
+        <td style="background: #AEF1AE">
+          KnolRepoImpl.this.logger.debug(&quot;updated successfully&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          62
+        </td>
+        <td>
+          44
+        </td>
+        <td>
+          1788
+          -
+          1797
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          scala.Int.&gt;=
+        </td>
+        <td style="background: #AEF1AE">
+          rows.&gt;=(1)
+        </td>
+      </tr><tr>
+        <td>
+          62
+        </td>
+        <td>
+          45
+        </td>
+        <td>
+          1780
+          -
+          1798
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          scala.Predef.require
+        </td>
+        <td style="background: #AEF1AE">
+          scala.this.Predef.require(rows.&gt;=(1))
+        </td>
+      </tr><tr>
+        <td>
+          63
+        </td>
+        <td>
+          46
+        </td>
+        <td>
+          1809
+          -
+          1819
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          scala.Some.apply
+        </td>
+        <td style="background: #AEF1AE">
+          scala.Some.apply[Int](rows)
+        </td>
+      </tr><tr>
+        <td>
+          65
+        </td>
+        <td>
+          48
+        </td>
+        <td>
+          1870
+          -
+          1874
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          scala.None
+        </td>
+        <td style="background: #AEF1AE">
+          scala.None
+        </td>
+      </tr><tr>
+        <td>
+          67
+        </td>
+        <td>
+          50
+        </td>
+        <td>
+          1905
+          -
+          1917
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          java.sql.Connection.close
+        </td>
+        <td style="background: #AEF1AE">
+          conn.close()
+        </td>
+      </tr><tr>
+        <td>
+          67
+        </td>
+        <td>
+          49
+        </td>
+        <td>
+          1905
+          -
+          1917
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.Connection.close
+        </td>
+        <td style="background: #AEF1AE">
+          conn.close()
+        </td>
+      </tr><tr>
+        <td>
+          71
+        </td>
+        <td>
+          51
+        </td>
+        <td>
+          1960
+          -
+          1964
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          scala.None
+        </td>
+        <td style="background: #F0ADAD">
+          scala.None
+        </td>
+      </tr><tr>
+        <td>
+          78
+        </td>
+        <td>
+          52
+        </td>
+        <td>
+          2105
+          -
+          2117
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          com.knol.db.connection.DBConnection.getConnect
+        </td>
+        <td style="background: #AEF1AE">
+          KnolRepoImpl.this.getConnect()
+        </td>
+      </tr><tr>
+        <td>
+          82
+        </td>
+        <td>
+          62
+        </td>
+        <td>
+          2182
+          -
+          2452
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;nosymbol&gt;
+        </td>
+        <td style="background: #AEF1AE">
+          {
+  val prep: java.sql.PreparedStatement = conn.prepareStatement(&quot;delete from KNOL where id=?&quot;);
+  prep.setInt(1, id);
+  val rows: Int = prep.executeUpdate();
+  KnolRepoImpl.this.logger.debug(&quot;Rows affected &quot;.+(rows));
+  KnolRepoImpl.this.logger.debug(&quot;deleted successfully&quot;);
+  scala.this.Predef.require(rows.&gt;=(1));
+  scala.Some.apply[Int](rows)
+}
+        </td>
+      </tr><tr>
+        <td>
+          83
+        </td>
+        <td>
+          53
+        </td>
+        <td>
+          2193
+          -
+          2245
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.Connection.prepareStatement
+        </td>
+        <td style="background: #AEF1AE">
+          conn.prepareStatement(&quot;delete from KNOL where id=?&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          84
+        </td>
+        <td>
+          54
+        </td>
+        <td>
+          2254
+          -
+          2272
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.PreparedStatement.setInt
+        </td>
+        <td style="background: #AEF1AE">
+          prep.setInt(1, id)
+        </td>
+      </tr><tr>
+        <td>
+          85
+        </td>
+        <td>
+          55
+        </td>
+        <td>
+          2292
+          -
+          2310
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.PreparedStatement.executeUpdate
+        </td>
+        <td style="background: #AEF1AE">
+          prep.executeUpdate()
+        </td>
+      </tr><tr>
+        <td>
+          86
+        </td>
+        <td>
+          56
+        </td>
+        <td>
+          2332
+          -
+          2355
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.lang.String.+
+        </td>
+        <td style="background: #AEF1AE">
+          &quot;Rows affected &quot;.+(rows)
+        </td>
+      </tr><tr>
+        <td>
+          86
+        </td>
+        <td>
+          57
+        </td>
+        <td>
+          2319
+          -
+          2356
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          org.slf4j.Logger.debug
+        </td>
+        <td style="background: #AEF1AE">
+          KnolRepoImpl.this.logger.debug(&quot;Rows affected &quot;.+(rows))
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          58
+        </td>
+        <td>
+          2365
+          -
+          2401
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          org.slf4j.Logger.debug
+        </td>
+        <td style="background: #AEF1AE">
+          KnolRepoImpl.this.logger.debug(&quot;deleted successfully&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          88
+        </td>
+        <td>
+          59
+        </td>
+        <td>
+          2421
+          -
+          2430
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          scala.Int.&gt;=
+        </td>
+        <td style="background: #AEF1AE">
+          rows.&gt;=(1)
+        </td>
+      </tr><tr>
+        <td>
+          88
+        </td>
+        <td>
+          60
+        </td>
+        <td>
+          2413
+          -
+          2431
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          scala.Predef.require
+        </td>
+        <td style="background: #AEF1AE">
+          scala.this.Predef.require(rows.&gt;=(1))
+        </td>
+      </tr><tr>
+        <td>
+          89
+        </td>
+        <td>
+          61
+        </td>
+        <td>
+          2442
+          -
+          2452
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          scala.Some.apply
+        </td>
+        <td style="background: #AEF1AE">
+          scala.Some.apply[Int](rows)
+        </td>
+      </tr><tr>
+        <td>
+          91
+        </td>
+        <td>
+          63
+        </td>
+        <td>
+          2503
+          -
+          2507
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          scala.None
+        </td>
+        <td style="background: #AEF1AE">
+          scala.None
+        </td>
+      </tr><tr>
+        <td>
+          93
+        </td>
+        <td>
+          65
+        </td>
+        <td>
+          2538
+          -
+          2550
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          java.sql.Connection.close
+        </td>
+        <td style="background: #AEF1AE">
+          conn.close()
+        </td>
+      </tr><tr>
+        <td>
+          93
+        </td>
+        <td>
+          64
+        </td>
+        <td>
+          2538
+          -
+          2550
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.Connection.close
+        </td>
+        <td style="background: #AEF1AE">
+          conn.close()
+        </td>
+      </tr><tr>
+        <td>
+          97
+        </td>
+        <td>
+          66
+        </td>
+        <td>
+          2589
+          -
+          2610
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          org.slf4j.Logger.debug
+        </td>
+        <td style="background: #F0ADAD">
+          KnolRepoImpl.this.logger.debug(&quot;Error&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          98
+        </td>
+        <td>
+          67
+        </td>
+        <td>
+          2619
+          -
+          2623
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          scala.None
+        </td>
+        <td style="background: #F0ADAD">
+          scala.None
+        </td>
+      </tr><tr>
+        <td>
+          106
+        </td>
+        <td>
+          68
+        </td>
+        <td>
+          2790
+          -
+          2802
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          com.knol.db.connection.DBConnection.getConnect
+        </td>
+        <td style="background: #AEF1AE">
+          KnolRepoImpl.this.getConnect()
+        </td>
+      </tr><tr>
+        <td>
+          110
+        </td>
+        <td>
+          79
+        </td>
+        <td>
+          2870
+          -
+          3321
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;nosymbol&gt;
+        </td>
+        <td style="background: #AEF1AE">
+          {
+  val query: String = &quot;select * from KNOL where id=&quot;.+(id).+(&quot;;&quot;);
+  val ps: java.sql.Statement = conn.createStatement();
+  val set: java.sql.ResultSet = ps.executeQuery(query);
+  set.next();
+  val kid: Int = set.getInt(&quot;id&quot;);
+  val kname: String = set.getString(&quot;name&quot;);
+  val kemail: String = set.getString(&quot;email&quot;);
+  val kmobile: String = set.getString(&quot;mobile&quot;);
+  scala.Some.apply[com.knol.core.Knol](com.knol.core.Knol.apply(kname, kemail, kmobile, kid))
+}
+        </td>
+      </tr><tr>
+        <td>
+          111
+        </td>
+        <td>
+          69
+        </td>
+        <td>
+          2882
+          -
+          2923
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.lang.String.+
+        </td>
+        <td style="background: #AEF1AE">
+          &quot;select * from KNOL where id=&quot;.+(id).+(&quot;;&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          112
+        </td>
+        <td>
+          70
+        </td>
+        <td>
+          2943
+          -
+          2965
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.Connection.createStatement
+        </td>
+        <td style="background: #AEF1AE">
+          conn.createStatement()
+        </td>
+      </tr><tr>
+        <td>
+          113
+        </td>
+        <td>
+          71
+        </td>
+        <td>
+          2987
+          -
+          3009
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.Statement.executeQuery
+        </td>
+        <td style="background: #AEF1AE">
+          ps.executeQuery(query)
+        </td>
+      </tr><tr>
+        <td>
+          115
+        </td>
+        <td>
+          72
+        </td>
+        <td>
+          3022
+          -
+          3032
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.ResultSet.next
+        </td>
+        <td style="background: #AEF1AE">
+          set.next()
+        </td>
+      </tr><tr>
+        <td>
+          116
+        </td>
+        <td>
+          73
+        </td>
+        <td>
+          3053
+          -
+          3069
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.ResultSet.getInt
+        </td>
+        <td style="background: #AEF1AE">
+          set.getInt(&quot;id&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          117
+        </td>
+        <td>
+          74
+        </td>
+        <td>
+          3092
+          -
+          3113
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.ResultSet.getString
+        </td>
+        <td style="background: #AEF1AE">
+          set.getString(&quot;name&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          118
+        </td>
+        <td>
+          75
+        </td>
+        <td>
+          3137
+          -
+          3159
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.ResultSet.getString
+        </td>
+        <td style="background: #AEF1AE">
+          set.getString(&quot;email&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          119
+        </td>
+        <td>
+          76
+        </td>
+        <td>
+          3184
+          -
+          3207
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.ResultSet.getString
+        </td>
+        <td style="background: #AEF1AE">
+          set.getString(&quot;mobile&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          122
+        </td>
+        <td>
+          77
+        </td>
+        <td>
+          3287
+          -
+          3320
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          com.knol.core.Knol.apply
+        </td>
+        <td style="background: #AEF1AE">
+          com.knol.core.Knol.apply(kname, kemail, kmobile, kid)
+        </td>
+      </tr><tr>
+        <td>
+          122
+        </td>
+        <td>
+          78
+        </td>
+        <td>
+          3282
+          -
+          3321
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          scala.Some.apply
+        </td>
+        <td style="background: #AEF1AE">
+          scala.Some.apply[com.knol.core.Knol](com.knol.core.Knol.apply(kname, kemail, kmobile, kid))
+        </td>
+      </tr><tr>
+        <td>
+          124
+        </td>
+        <td>
+          80
+        </td>
+        <td>
+          3372
+          -
+          3376
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          scala.None
+        </td>
+        <td style="background: #AEF1AE">
+          scala.None
+        </td>
+      </tr><tr>
+        <td>
+          126
+        </td>
+        <td>
+          82
+        </td>
+        <td>
+          3407
+          -
+          3419
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          java.sql.Connection.close
+        </td>
+        <td style="background: #AEF1AE">
+          conn.close()
+        </td>
+      </tr><tr>
+        <td>
+          126
+        </td>
+        <td>
+          81
+        </td>
+        <td>
+          3407
+          -
+          3419
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.Connection.close
+        </td>
+        <td style="background: #AEF1AE">
+          conn.close()
+        </td>
+      </tr><tr>
+        <td>
+          129
+        </td>
+        <td>
+          83
+        </td>
+        <td>
+          3457
+          -
+          3461
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          scala.None
+        </td>
+        <td style="background: #F0ADAD">
+          scala.None
+        </td>
+      </tr><tr>
+        <td>
+          137
+        </td>
+        <td>
+          84
+        </td>
+        <td>
+          3659
+          -
+          3671
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          com.knol.db.connection.DBConnection.getConnect
+        </td>
+        <td style="background: #AEF1AE">
+          KnolRepoImpl.this.getConnect()
+        </td>
+      </tr><tr>
+        <td>
+          138
+        </td>
+        <td>
+          85
+        </td>
+        <td>
+          3692
+          -
+          3711
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          scala.collection.generic.GenericCompanion.apply
+        </td>
+        <td style="background: #AEF1AE">
+          scala.collection.mutable.MutableList.apply[com.knol.core.Knol]()
+        </td>
+      </tr><tr>
+        <td>
+          141
+        </td>
+        <td>
+          101
+        </td>
+        <td>
+          3775
+          -
+          4189
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;nosymbol&gt;
+        </td>
+        <td style="background: #AEF1AE">
+          {
+  val query: String = &quot;select * from KNOL;&quot;;
+  val ps: java.sql.Statement = conn.createStatement();
+  val set: java.sql.ResultSet = ps.executeQuery(query);
+  while$1(){
+    if (set.next())
+      {
+        {
+          val kid: Int = set.getInt(&quot;id&quot;);
+          val kname: String = set.getString(&quot;name&quot;);
+          val kemail: String = set.getString(&quot;email&quot;);
+          val kmobile: String = set.getString(&quot;mobile&quot;);
+          knol_list.+=(com.knol.core.Knol.apply(kmobile, kname, kemail, kid))
+        };
+        while$1()
+      }
+    else
+      ()
+  };
+  scala.Some.apply[scala.collection.mutable.MutableList[com.knol.core.Knol]](knol_list)
+}
+        </td>
+      </tr><tr>
+        <td>
+          142
+        </td>
+        <td>
+          86
+        </td>
+        <td>
+          3787
+          -
+          3808
+        </td>
+        <td>
+          Literal
+        </td>
+        <td>
+          &lt;nosymbol&gt;
+        </td>
+        <td style="background: #AEF1AE">
+          &quot;select * from KNOL;&quot;
+        </td>
+      </tr><tr>
+        <td>
+          143
+        </td>
+        <td>
+          87
+        </td>
+        <td>
+          3826
+          -
+          3848
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.Connection.createStatement
+        </td>
+        <td style="background: #AEF1AE">
+          conn.createStatement()
+        </td>
+      </tr><tr>
+        <td>
+          144
+        </td>
+        <td>
+          88
+        </td>
+        <td>
+          3868
+          -
+          3890
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.Statement.executeQuery
+        </td>
+        <td style="background: #AEF1AE">
+          ps.executeQuery(query)
+        </td>
+      </tr><tr>
+        <td>
+          146
+        </td>
+        <td>
+          89
+        </td>
+        <td>
+          3908
+          -
+          3918
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.ResultSet.next
+        </td>
+        <td style="background: #AEF1AE">
+          set.next()
+        </td>
+      </tr><tr>
+        <td>
+          146
+        </td>
+        <td>
+          98
+        </td>
+        <td>
+          3901
+          -
+          3901
+        </td>
+        <td>
+          Literal
+        </td>
+        <td>
+          &lt;nosymbol&gt;
+        </td>
+        <td style="background: #AEF1AE">
+          ()
+        </td>
+      </tr><tr>
+        <td>
+          146
+        </td>
+        <td>
+          97
+        </td>
+        <td>
+          3920
+          -
+          4165
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;nosymbol&gt;
+        </td>
+        <td style="background: #AEF1AE">
+          {
+  {
+    val kid: Int = set.getInt(&quot;id&quot;);
+    val kname: String = set.getString(&quot;name&quot;);
+    val kemail: String = set.getString(&quot;email&quot;);
+    val kmobile: String = set.getString(&quot;mobile&quot;);
+    knol_list.+=(com.knol.core.Knol.apply(kmobile, kname, kemail, kid))
+  };
+  while$1()
+}
+        </td>
+      </tr><tr>
+        <td>
+          146
+        </td>
+        <td>
+          96
+        </td>
+        <td>
+          3920
+          -
+          3920
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          com.knol.core.impl.KnolRepoImpl.while$1
+        </td>
+        <td style="background: #AEF1AE">
+          while$1()
+        </td>
+      </tr><tr>
+        <td>
+          146
+        </td>
+        <td>
+          99
+        </td>
+        <td>
+          3901
+          -
+          3901
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;nosymbol&gt;
+        </td>
+        <td style="background: #AEF1AE">
+          ()
+        </td>
+      </tr><tr>
+        <td>
+          147
+        </td>
+        <td>
+          90
+        </td>
+        <td>
+          3942
+          -
+          3958
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.ResultSet.getInt
+        </td>
+        <td style="background: #AEF1AE">
+          set.getInt(&quot;id&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          148
+        </td>
+        <td>
+          91
+        </td>
+        <td>
+          3981
+          -
+          4002
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.ResultSet.getString
+        </td>
+        <td style="background: #AEF1AE">
+          set.getString(&quot;name&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          149
+        </td>
+        <td>
+          92
+        </td>
+        <td>
+          4026
+          -
+          4048
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.ResultSet.getString
+        </td>
+        <td style="background: #AEF1AE">
+          set.getString(&quot;email&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          150
+        </td>
+        <td>
+          93
+        </td>
+        <td>
+          4073
+          -
+          4096
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.ResultSet.getString
+        </td>
+        <td style="background: #AEF1AE">
+          set.getString(&quot;mobile&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          151
+        </td>
+        <td>
+          95
+        </td>
+        <td>
+          4107
+          -
+          4155
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          scala.collection.mutable.MutableList.+=
+        </td>
+        <td style="background: #AEF1AE">
+          knol_list.+=(com.knol.core.Knol.apply(kmobile, kname, kemail, kid))
+        </td>
+      </tr><tr>
+        <td>
+          151
+        </td>
+        <td>
+          94
+        </td>
+        <td>
+          4121
+          -
+          4154
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          com.knol.core.Knol.apply
+        </td>
+        <td style="background: #AEF1AE">
+          com.knol.core.Knol.apply(kmobile, kname, kemail, kid)
+        </td>
+      </tr><tr>
+        <td>
+          153
+        </td>
+        <td>
+          100
+        </td>
+        <td>
+          4174
+          -
+          4189
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          scala.Some.apply
+        </td>
+        <td style="background: #AEF1AE">
+          scala.Some.apply[scala.collection.mutable.MutableList[com.knol.core.Knol]](knol_list)
+        </td>
+      </tr><tr>
+        <td>
+          155
+        </td>
+        <td>
+          102
+        </td>
+        <td>
+          4240
+          -
+          4244
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          scala.None
+        </td>
+        <td style="background: #F0ADAD">
+          scala.None
+        </td>
+      </tr><tr>
+        <td>
+          157
+        </td>
+        <td>
+          104
+        </td>
+        <td>
+          4275
+          -
+          4287
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          java.sql.Connection.close
+        </td>
+        <td style="background: #AEF1AE">
+          conn.close()
+        </td>
+      </tr><tr>
+        <td>
+          157
+        </td>
+        <td>
+          103
+        </td>
+        <td>
+          4275
+          -
+          4287
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          java.sql.Connection.close
+        </td>
+        <td style="background: #AEF1AE">
+          conn.close()
+        </td>
+      </tr><tr>
+        <td>
+          160
+        </td>
+        <td>
+          105
+        </td>
+        <td>
+          4325
+          -
+          4329
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          scala.None
+        </td>
+        <td style="background: #F0ADAD">
+          scala.None
+        </td>
+      </tr>
+    </table>
+          </div>
+        </div>
+      </body>
+    </html>
